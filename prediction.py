@@ -41,15 +41,13 @@ def upload_file():
             file.save(imagePath)
 
             # Get the predictions
-            predictions = predict(imagePath)
+            prediction, percentage = predict(imagePath)
 
             # Remove the image from the disk
             os.remove(imagePath)
 
             # Return the predictions
-            return predictions
-
-    return request.method
+            return prediction, percentage
 
 
 def predict(IMG_PATH):
@@ -72,9 +70,8 @@ def predict(IMG_PATH):
     # Return class and probability
     prediction = labels[1]
     percentage = '%.2f%%' % (prediction[2]*100)
-    final_predict = prediction + " --> " + percentage
 
-    return final_predict
+    return prediction, percentage
 
 # So that the flask app starts when the python script is started in cli
 if __name__ == "__main__":
