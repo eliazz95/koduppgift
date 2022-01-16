@@ -13,7 +13,6 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-#app.secret_key = "super secret key"
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -33,6 +32,7 @@ def upload_file():
             flash('No selected file')
             return redirect(request.url)
         if file and allowed_file(file.filename):
+            # Returns a secure version of the file
             filename = secure_filename(file.filename)
 
             imagePath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -51,7 +51,6 @@ def upload_file():
 
 
 def predict(IMG_PATH):
-    print('Predicting...')
     img = image.load_img(IMG_PATH, target_size=(224, 224))
 
     # Convert image to numpy array
