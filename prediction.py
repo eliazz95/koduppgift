@@ -41,13 +41,13 @@ def upload_file():
             file.save(imagePath)
 
             # Get the predictions
-            prediction, percentage = predict(imagePath)
+            prediction = predict(imagePath)
 
             # Remove the image from the disk
             os.remove(imagePath)
 
             # Return the predictions
-            return prediction, percentage
+            return prediction
 
 
 def predict(IMG_PATH):
@@ -66,12 +66,10 @@ def predict(IMG_PATH):
     labels = decode_predictions(init_predict)
     # Get the prediction with the highest probability
     labels = labels[0][0]
-
     # Return class and probability
     prediction = labels[1]
-    percentage = '%.2f%%' % (prediction[2]*100)
 
-    return prediction, percentage
+    return prediction
 
 # So that the flask app starts when the python script is started in cli
 if __name__ == "__main__":
