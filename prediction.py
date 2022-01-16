@@ -1,18 +1,19 @@
-from flask import Flask
 import os
 from flask import Flask, flash, request, redirect, url_for
 from werkzeug.utils import secure_filename
+
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
 from tensorflow.keras.preprocessing import image
-import numpy as np
+
 
 UPLOAD_FOLDER = '/app/uploads'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.secret_key = "super secret key"
+#app.secret_key = "super secret key"
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -54,21 +55,26 @@ def upload_file():
 def predict(IMG_PATH):
     img = image.load_img(IMG_PATH, target_size=(224, 224))
 
+    # Convert image to numpy array
     img_array = image.img_to_array(img)
     img_batch = np.expand_dims(img_array, axis=0)
-    img_preprocessed = tf.keras.applications.mobilenet_v2.preprocess_input(img_batch)
+    # Apply MobileNet preprocessing
+    img_preprocessed = preprocess_input(img_batch)
 
     model = tf.keras.applications.mobilenet_v2.MobileNetV2()
-    labels = model.predict(img_preprocessed)
+    # Get prediction for the give image
+    init_predict = model.predict(img_preprocessed)
+    # Get readable class labels for the prediction
+    labels = decode_predictions(init_predict)
+    # Get the prediction with the highest probability
+    labels = labels[0][0]
 
-    predictions = decode_predictions(labels)
+    # Return class and probability
+    prediction = labels[1]
+    percentage = '%.2f%%' % (prediction[2]*100)
+    final_predict = prediction + " --> " + percentage
 
-    predictions = predictions[0][0]
-
-    pred = predictions[1]
-    percentage = '%.2f%%' % (predictions[2]*100)
-
-    return pred, percentage
+    return final_predict
 
 # So that the flask app starts when the python script is started in cli
 if __name__ == "__main__":
