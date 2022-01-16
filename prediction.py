@@ -51,6 +51,7 @@ def upload_file():
 
 
 def predict(IMG_PATH):
+    print('Predicting...')
     img = image.load_img(IMG_PATH, target_size=(224, 224))
 
     # Convert image to numpy array
